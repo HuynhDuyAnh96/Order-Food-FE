@@ -1,0 +1,50 @@
+@import "tailwindcss";
+/* 
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+} */
+/* bổ sung vào app/styles/globals.css hoặc layout.css đã tạo */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.card-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.card-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+.chart-placeholder {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  border: 1px dashed #e5e7eb;
+  border-radius: 8px;
+}
