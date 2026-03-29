@@ -1,0 +1,141 @@
+/* ── Card ──────────────────────────────────────────────────────────────────── */
+.kc {
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+}
+
+.kc:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+
+.kc--warning { border-color: #f59e0b; }
+
+.kc--urgent {
+  border-color: #ef4444;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.2); }
+  50%       { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.kc__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px 14px;
+  background: #1f2a44;
+  color: #fff;
+}
+
+.kc--warning .kc__head { background: #b45309; }
+.kc--urgent  .kc__head { background: #b91c1c; }
+
+.kc__priority {
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.18);
+  border-radius: 8px;
+  padding: 3px 9px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.kc__table {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.kc__table-label {
+  font-size: 11px;
+  opacity: 0.65;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.kc__table-num {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.kc__timer {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.kc__timer--urgent {
+  opacity: 1;
+  color: #fef08a;
+}
+
+/* ── Item list ─────────────────────────────────────────────────────────────── */
+.kc__items {
+  list-style: none;
+  margin: 0;
+  padding: 14px 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kc__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.kc__item-name {
+  flex: 1;
+  font-weight: 500;
+  color: #111827;
+}
+
+.kc__item-qty {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  min-width: 28px;
+  text-align: right;
+}
+
+.kc__item-dup {
+  font-size: 15px;
+  cursor: default;
+  flex-shrink: 0;
+  /* tooltip via title attribute */
+}
+
+/* ── Done button ───────────────────────────────────────────────────────────── */
+.kc__done-btn {
+  margin: 0 14px 14px;
+  padding: 13px;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 0.2px;
+}
+
+.kc__done-btn:hover:not(:disabled)  { background: #15803d; }
+.kc__done-btn:active:not(:disabled) { transform: scale(0.98); }
+.kc__done-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}

@@ -1,3 +1,5 @@
+'use client';
+
 // app/admin/users/[id]/page.tsx
 import React from 'react';
 import { useRouter } from 'next/navigation';

@@ -5,6 +5,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrders } from '../../../hooks/useOrders';
+import { apiBase, getWebSocketUrl } from '@/lib/api';
 import './OrderItemsList.css';
 
 interface ProductSummary {
@@ -20,51 +21,47 @@ interface ProductSummary {
 }
 
 export default function OrderItemsList() {
-  const { orders, loading, error } = useOrders();
+  const { orders, loading, error, refetch } = useOrders();
   const [soundEnabled, setSoundEnabled] = useState(true);
   const wsRef = useRef<WebSocket | null>(null);
+  const refetchRef = useRef(refetch);
+  const soundEnabledRef = useRef(soundEnabled);
+
+  useEffect(() => { refetchRef.current = refetch; }, [refetch]);
+  useEffect(() => { soundEnabledRef.current = soundEnabled; }, [soundEnabled]);
 
   useEffect(() => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      return;
-    }
+    const connect = () => {
+      if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) return;
 
-    wsRef.current = new WebSocket('ws://localhost:8080/api/ws');
+      const ws = new WebSocket(getWebSocketUrl());
+      wsRef.current = ws;
 
-    wsRef.current.onopen = () => {
-      console.log('WebSocket connected');
+      ws.onopen = () => console.log('WebSocket connected');
+
+      ws.onmessage = (event) => {
+        const newOrder = JSON.parse(event.data);
+        if (soundEnabledRef.current && newOrder.status === 'pending') {
+          playNotificationSound();
+        }
+        refetchRef.current?.();
+      };
+
+      ws.onerror = () => {};
+
+      ws.onclose = (event) => {
+        if (event.code !== 1000) {
+          setTimeout(connect, 3000);
+        }
+      };
     };
 
-    wsRef.current.onmessage = (event) => {
-      console.log('New order received:', event.data);
-      const newOrder = JSON.parse(event.data);
-      if (soundEnabled && newOrder.status === "pending") {
-        playNotificationSound();
-      }
-    };
-
-    wsRef.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    wsRef.current.onclose = (event) => {
-      console.log('WebSocket disconnected:', event.code, event.reason);
-      if (event.code !== 1000) {
-        setTimeout(() => {
-          if (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED) {
-            console.log('Reconnecting...');
-            wsRef.current = null;
-          }
-        }, 3000);
-      }
-    };
+    connect();
 
     return () => {
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.close();
-      }
+      wsRef.current?.close(1000);
     };
-  }, [soundEnabled]);
+  }, []);
 
   const playNotificationSound = () => {
     const audio = new Audio('/thongbao2.mp3');
@@ -80,7 +77,7 @@ export default function OrderItemsList() {
           const key = item.title || item.dish_id || 'Sản phẩm không xác định';
           const existing = productMap.get(key);
 
-          let tableNum = parseInt(order.table_number as any, 10);
+          let tableNum = parseInt(String(order.table_number), 10);
           if (isNaN(tableNum) || tableNum < 1 || tableNum > 20) tableNum = 0;
 
           if (existing) {
@@ -114,13 +111,13 @@ export default function OrderItemsList() {
       
       if (newStatus === "preparing") {
         // Sử dụng endpoint confirm cho việc xác nhận đơn hàng
-        response = await fetch(`http://localhost:8080/api/orders/${orderId}/confirm`, {
+        response = await fetch(`${apiBase}/orders/${orderId}/confirm`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
         });
       } else {
         // Sử dụng endpoint PATCH cho các trạng thái khác
-        response = await fetch(`http://localhost:8080/api/orders/${orderId}`, {
+        response = await fetch(`${apiBase}/orders/${orderId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: newStatus }),
@@ -129,8 +126,12 @@ export default function OrderItemsList() {
 
       if (response.ok) {
         alert(`Cập nhật trạng thái thành ${newStatus}!`);
-        // Reload lại trang để cập nhật dữ liệu
-        window.location.reload();
+        // Refetch orders thay vì reload toàn bộ trang
+        if (refetch) {
+          refetch();
+        } else {
+          window.location.reload();
+        }
       } else {
         const errorData = await response.text();
         console.error('Error response:', errorData);

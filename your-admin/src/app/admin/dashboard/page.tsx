@@ -3,11 +3,11 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { useOrders } from '../../hooks/useOrders';
-import OrderCard from './components/OrderItemsList';
+import { publicApiOrigin } from '@/lib/api';
 
 const StatsCard = dynamic(() => import('./components/StatsCard'), { ssr: false });
-const ChartPanel = dynamic(() => import('./components/ChartPanel'), { ssr: false });
 const OrderItemsList = dynamic(() => import('./components/OrderItemsList'), { ssr: false });
+const OrdersList = dynamic(() => import('./components/OrdersList'), { ssr: false });
 
 // Icons for different stats
 const OrdersIcon = () => (
@@ -36,7 +36,7 @@ const AverageIcon = () => (
 );
 
 export default function DashboardPage() {
-  const { orders, loading, error, stats } = useOrders();
+  const { loading, error, stats } = useOrders();
 
   if (error) {
     return (
@@ -49,7 +49,7 @@ export default function DashboardPage() {
       }}>
         <h3>Lỗi khi tải dữ liệu</h3>
         <p>{error}</p>
-        <p>Vui lòng kiểm tra API server tại http://localhost:8080/api/orders</p>
+        <p>Vui lòng kiểm tra API server tại {publicApiOrigin}/api/orders</p>
       </div>
     );
   }
@@ -98,6 +98,10 @@ export default function DashboardPage() {
       
       <div style={{ gridColumn: '1 / -1' }}>
         <OrderItemsList />
+      </div>
+      
+      <div style={{ gridColumn: '1 / -1' }}>
+        <OrdersList />
       </div>
     </div>
   );

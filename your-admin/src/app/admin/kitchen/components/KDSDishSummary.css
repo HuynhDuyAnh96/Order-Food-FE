@@ -1,0 +1,52 @@
+.ds {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fefce8;
+  border: 1.5px solid #fde047;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.ds__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #854d0e;
+  white-space: nowrap;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.ds__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ds__chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #fde047;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+.ds__chip-name {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.ds__chip-total {
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.ds__chip-detail {
+  color: #6b7280;
+  font-size: 12px;
+}

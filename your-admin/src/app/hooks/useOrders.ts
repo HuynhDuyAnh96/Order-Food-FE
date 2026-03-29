@@ -1,5 +1,8 @@
+'use client';
+
 // hooks/useOrders.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { apiBase } from '@/lib/api';
 
 export interface OrderItem {
   dish_id: string;
@@ -30,29 +33,34 @@ export function useOrders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('http://localhost:8080/api/orders');
-        if (!response.ok) {
-          throw new Error('Failed to fetch orders');
-        }
-        const result = await response.json();
-        // API trả về { data: [...], success: true }
-        const ordersData = result.data || [];
-        setOrders(ordersData);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching orders:', err);
-      } finally {
-        setLoading(false);
+  const fetchOrders = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${apiBase}/orders`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch orders');
       }
-    };
-
-    fetchOrders();
+      const result = await response.json();
+      // API trả về { data: [...], success: true }
+      const ordersData = result.data || [];
+      setOrders(ordersData);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error fetching orders:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchOrders();
+
+    // Fallback polling 60s - WS xử lý real-time chính
+    const interval = setInterval(fetchOrders, 60000);
+
+    return () => clearInterval(interval);
+  }, [fetchOrders]);
 
   const stats: OrderStats = {
     totalOrders: orders.length,
@@ -63,5 +71,5 @@ export function useOrders() {
       : 0
   };
 
-  return { orders, loading, error, stats };
+  return { orders, loading, error, stats, refetch: fetchOrders };
 }

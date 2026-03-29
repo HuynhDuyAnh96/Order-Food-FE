@@ -4,8 +4,8 @@ import React from 'react';
 
 const links = [
   { href: '/admin/dashboard', label: 'Dashboard' },
-  { href: '/admin/users', label: 'Người dùng' },
-  // thêm routes khác nếu cần
+  { href: '/admin/kitchen',   label: '🍳 Bếp Board' },
+  { href: '/admin/users',     label: 'Người dùng' },
 ];
 
 export default function Sidebar() {
