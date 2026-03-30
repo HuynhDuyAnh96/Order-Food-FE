@@ -1,5 +1,6 @@
+'use client';
 // app/components/LayoutAdmin.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from './SidebarAdmin';
 import Header from './HeaderAdmin';
 import '../style/layout.css';
@@ -9,13 +10,21 @@ type Props = {
 };
 
 export default function LayoutAdmin({ children }: Props) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar" aria-label="Sidebar">
-        <Sidebar />
+      {/* Overlay khi sidebar mở trên mobile */}
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <aside className={`admin-sidebar ${sidebarOpen ? 'sidebar-open' : ''}`} aria-label="Sidebar">
+        <Sidebar onClose={() => setSidebarOpen(false)} />
       </aside>
+
       <div className="admin-main">
-        <Header />
+        <Header onMenuClick={() => setSidebarOpen(true)} />
         <main className="admin-content">{children}</main>
       </div>
     </div>

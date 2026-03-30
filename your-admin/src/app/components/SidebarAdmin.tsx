@@ -8,14 +8,21 @@ const links = [
   { href: '/admin/users',     label: 'Người dùng' },
 ];
 
-export default function Sidebar() {
+type Props = {
+  onClose: () => void;
+};
+
+export default function Sidebar({ onClose }: Props) {
   return (
     <nav className="sidebar">
-      <div className="sidebar-brand">Admin</div>
+      <div className="sidebar-header">
+        <div className="sidebar-brand">Admin</div>
+        <button className="sidebar-close" onClick={onClose} aria-label="Đóng menu">✕</button>
+      </div>
       <ul>
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href}>{l.label}</Link>
+            <Link href={l.href} onClick={onClose}>{l.label}</Link>
           </li>
         ))}
       </ul>
