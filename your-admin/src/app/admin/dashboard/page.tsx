@@ -49,7 +49,10 @@ export default function DashboardPage() {
       }}>
         <h3>Lỗi khi tải dữ liệu</h3>
         <p>{error}</p>
-        <p>Vui lòng kiểm tra API server tại {publicApiOrigin}/api/orders</p>
+        <p>
+          Vui lòng kiểm tra API server tại{' '}
+          {publicApiOrigin ? `${publicApiOrigin}/api/orders` : '(chưa cấu hình NEXT_PUBLIC_API_BASE_URL)'}
+        </p>
       </div>
     );
   }

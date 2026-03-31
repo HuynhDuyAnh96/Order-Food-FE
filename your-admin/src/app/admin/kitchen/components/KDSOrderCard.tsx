@@ -11,11 +11,12 @@ interface Props {
 export default function KDSOrderCard({ order, onComplete }: Props) {
   const [loading, setLoading] = useState(false);
 
-  const urgent  = order.wait_minutes >= 15;
-  const warning = order.wait_minutes >= 8 && !urgent;
+  const urgent     = order.wait_minutes >= 15;
+  const warning    = order.wait_minutes >= 8 && !urgent;
+  const isTakeaway = order.order_type === 'takeaway';
 
   const handleComplete = async () => {
-    if (!order.order_id) return; // guard: ID rỗng thì không gọi API
+    if (!order.order_id) return;
     setLoading(true);
     try {
       await onComplete(order.order_id);
@@ -25,16 +26,22 @@ export default function KDSOrderCard({ order, onComplete }: Props) {
   };
 
   return (
-    <div className={`kc ${urgent ? 'kc--urgent' : warning ? 'kc--warning' : ''}`}>
+    <div className={`kc ${urgent ? 'kc--urgent' : warning ? 'kc--warning' : ''} ${isTakeaway ? 'kc--takeaway' : ''}`}>
 
-      {/* ── Header: ưu tiên + số bàn + thời gian chờ ─────────────────── */}
+      {/* ── Header ────────────────────────────────────────────────────── */}
       <div className="kc__head">
         <div className="kc__priority">#{order.priority}</div>
 
-        <div className="kc__table">
-          <span className="kc__table-label">BÀN</span>
-          <span className="kc__table-num">{order.table_number}</span>
-        </div>
+        {isTakeaway ? (
+          <div className="kc__table">
+            <span className="kc__takeaway-badge">🛵 MANG VỀ</span>
+          </div>
+        ) : (
+          <div className="kc__table">
+            <span className="kc__table-label">BÀN</span>
+            <span className="kc__table-num">{order.table_number}</span>
+          </div>
+        )}
 
         <div className={`kc__timer ${urgent ? 'kc__timer--urgent' : ''}`}>
           ⏱ {order.wait_minutes} phút
@@ -65,7 +72,7 @@ export default function KDSOrderCard({ order, onComplete }: Props) {
         onClick={handleComplete}
         disabled={loading}
       >
-        {loading ? 'Đang lưu...' : '✓ Hoàn thành bàn ' + order.table_number}
+        {loading ? 'Đang lưu...' : isTakeaway ? '✓ Hoàn thành - Mang về' : '✓ Hoàn thành bàn ' + order.table_number}
       </button>
     </div>
   );

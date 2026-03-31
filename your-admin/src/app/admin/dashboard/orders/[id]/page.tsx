@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { apiBase } from '@/lib/api';
+import { getApiBaseOrThrow } from '@/lib/api';
 import './order-detail.css';
 
 interface OrderItem {
@@ -36,6 +36,7 @@ export default function OrderDetailPage() {
     const fetchOrder = async () => {
       try {
         setLoading(true);
+        const apiBase = getApiBaseOrThrow();
         const response = await fetch(`${apiBase}/orders`);
         if (!response.ok) {
           throw new Error('Failed to fetch orders');
@@ -68,6 +69,7 @@ export default function OrderDetailPage() {
     try {
       setUpdating(true);
       let response;
+      const apiBase = getApiBaseOrThrow();
 
       if (newStatus === 'preparing') {
         response = await fetch(`${apiBase}/orders/${orderId}/confirm`, {

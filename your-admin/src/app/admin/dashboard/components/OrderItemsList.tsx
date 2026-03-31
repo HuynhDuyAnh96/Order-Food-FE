@@ -5,7 +5,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrders } from '../../../hooks/useOrders';
-import { apiBase, getWebSocketUrl } from '@/lib/api';
+import { getApiBaseOrThrow, getWebSocketUrl } from '@/lib/api';
 import './OrderItemsList.css';
 
 interface ProductSummary {
@@ -26,6 +26,7 @@ export default function OrderItemsList() {
   const wsRef = useRef<WebSocket | null>(null);
   const refetchRef = useRef(refetch);
   const soundEnabledRef = useRef(soundEnabled);
+  const fatalWsConfigErrorRef = useRef(false);
 
   useEffect(() => { refetchRef.current = refetch; }, [refetch]);
   useEffect(() => { soundEnabledRef.current = soundEnabled; }, [soundEnabled]);
@@ -34,7 +35,17 @@ export default function OrderItemsList() {
     const connect = () => {
       if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) return;
 
-      const ws = new WebSocket(getWebSocketUrl());
+      if (fatalWsConfigErrorRef.current) return;
+
+      let ws: WebSocket;
+      try {
+        ws = new WebSocket(getWebSocketUrl());
+      } catch (err) {
+        fatalWsConfigErrorRef.current = true;
+        console.error(err);
+        return;
+      }
+
       wsRef.current = ws;
 
       ws.onopen = () => console.log('WebSocket connected');
@@ -50,6 +61,7 @@ export default function OrderItemsList() {
       ws.onerror = () => {};
 
       ws.onclose = (event) => {
+        if (fatalWsConfigErrorRef.current) return;
         if (event.code !== 1000) {
           setTimeout(connect, 3000);
         }
@@ -107,6 +119,7 @@ export default function OrderItemsList() {
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     try {
+      const apiBase = getApiBaseOrThrow();
       let response;
       
       if (newStatus === "preparing") {

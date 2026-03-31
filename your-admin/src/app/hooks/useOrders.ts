@@ -2,7 +2,7 @@
 
 // hooks/useOrders.ts
 import { useState, useEffect, useCallback } from 'react';
-import { apiBase } from '@/lib/api';
+import { getApiBaseOrThrow } from '@/lib/api';
 
 export interface OrderItem {
   dish_id: string;
@@ -36,6 +36,7 @@ export function useOrders() {
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
+      const apiBase = getApiBaseOrThrow();
       const response = await fetch(`${apiBase}/orders`);
       if (!response.ok) {
         throw new Error('Failed to fetch orders');

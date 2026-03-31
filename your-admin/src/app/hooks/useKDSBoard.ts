@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { apiBase, getWebSocketUrl } from '@/lib/api';
+import { getApiBaseOrThrow, getWebSocketUrl } from '@/lib/api';
 
 export interface DuplicateInfo {
   table_number: number;
@@ -22,6 +22,7 @@ export interface KDSOrderItem {
 export interface KDSOrder {
   priority: number;
   order_id: string;
+  order_type: 'dine_in' | 'takeaway';
   table_number: number;
   created_at: string;
   wait_minutes: number;
@@ -46,9 +47,11 @@ export function useKDSBoard() {
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const fatalWsConfigErrorRef = useRef(false);
 
   const fetchBoard = useCallback(async () => {
     try {
+      const apiBase = getApiBaseOrThrow();
       const res = await fetch(`${apiBase}/kitchen/board`);
       if (!res.ok) throw new Error('Không thể tải bếp board');
       const json = await res.json();
@@ -65,6 +68,8 @@ export function useKDSBoard() {
     fetchBoard();
 
     const connect = () => {
+      if (fatalWsConfigErrorRef.current) return;
+
       const ws = new WebSocket(getWebSocketUrl());
       wsRef.current = ws;
       ws.onmessage = (e) => {
@@ -74,14 +79,25 @@ export function useKDSBoard() {
           if (refreshOn.includes(msg.event)) fetchBoard();
         } catch {}
       };
-      ws.onclose = () => setTimeout(connect, 3000);
+      ws.onclose = () => {
+        if (fatalWsConfigErrorRef.current) return;
+        setTimeout(connect, 3000);
+      };
     };
-    connect();
+
+    try {
+      connect();
+    } catch (err) {
+      fatalWsConfigErrorRef.current = true;
+      setError(err instanceof Error ? err.message : 'Lỗi WebSocket không xác định');
+      setLoading(false);
+    }
 
     return () => wsRef.current?.close();
   }, [fetchBoard]);
 
   const completeOrder = useCallback(async (orderId: string) => {
+    const apiBase = getApiBaseOrThrow();
     await fetch(`${apiBase}/kitchen/orders/${orderId}/complete`, { method: 'POST' });
   }, []);
 
