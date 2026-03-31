@@ -118,6 +118,19 @@
   /* tooltip via title attribute */
 }
 
+/* ── Takeaway ──────────────────────────────────────────────────────────────── */
+.kc--takeaway { border-color: #7c3aed; }
+.kc--takeaway .kc__head { background: #5b21b6; }
+
+.kc__takeaway-badge {
+  flex: 1;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: #fff;
+}
+
 /* ── Done button ───────────────────────────────────────────────────────────── */
 .kc__done-btn {
   margin: 0 14px 14px;
