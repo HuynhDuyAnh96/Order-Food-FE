@@ -3,9 +3,11 @@ import Link from 'next/link';
 import React from 'react';
 
 const links = [
-  { href: '/admin/dashboard', label: 'Dashboard' },
-  { href: '/admin/kitchen',   label: '🍳 Bếp Board' },
-  { href: '/admin/users',     label: 'Người dùng' },
+  { href: '/admin/dashboard',           label: 'Dashboard' },
+  { href: '/admin/kitchen',             label: '🍳 Bếp Board' },
+  { href: '/admin/inventory',           label: '📦 Tồn kho' },
+  { href: '/admin/inventory/sessions',  label: '🌙 Ca bán tối' },
+  { href: '/admin/users',               label: 'Người dùng' },
 ];
 
 type Props = {
